@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Avatar, Box, Button, Container, Grid, GridItem, Heading, HStack, Image, Skeleton, Text, useFocusEffect, VStack } from "@chakra-ui/react";
+import { useState } from "react";
+import { Avatar, Box, Button, Container, Grid, GridItem, Heading, HStack, Image, Skeleton, Text, VStack } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { FaStar } from "react-icons/fa";
 import { useParams } from "react-router-dom"
@@ -13,9 +13,9 @@ import "../calendar.css";
 export default function RoomDetail() {
     const {roomPk} = useParams()
     const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
-  const { data: reviewsData, isLoading: isReviewsLoading } = useQuery<IReview[]>([`rooms`, roomPk, `reviews`], getRoomReviews)
+  const { data: reviewsData } = useQuery<IReview[]>([`rooms`, roomPk, `reviews`], getRoomReviews)
   const [dates, setDates] = useState<Date[]>();
-  const { data: checkBookingData, isLoading: isCheckingBooking, refetch } = useQuery(['checking', roomPk, dates], checkBooking, {
+  const { data: checkBookingData, isLoading: isCheckingBooking } = useQuery(['checking', roomPk, dates], checkBooking, {
     cacheTime: 0,
     enabled: dates !== undefined
   })
