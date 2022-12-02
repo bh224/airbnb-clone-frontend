@@ -89,7 +89,7 @@ export default function RoomDetail() {
             <Avatar name={data?.owner.name} size={"lg"} src={data?.owner.avatar} />
           </HStack>
         
-          <Box mt={10} width={"60%"}>
+          <Box mt={10} width={"50%"}>
       <Heading mb={5} fontSize={"2xl"}>
         <HStack>
           <FaStar /> <Text>{data?.rating}</Text>
