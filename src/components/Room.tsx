@@ -1,6 +1,6 @@
 import { Box, Button, Grid, HStack, Image, Text, useColorModeValue, VStack } from "@chakra-ui/react";
-import { FaRegHeart, FaStar } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { FaCamera, FaRegHeart, FaStar } from "react-icons/fa";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 interface IRoomProps {
     imageURL: string;
@@ -10,18 +10,24 @@ interface IRoomProps {
     rating: number;
     price: number;
     pk: number;
+    isOwner: boolean;
 }
 
-export default function Room({pk, imageURL, name, city, country, rating, price}:IRoomProps) {
+export default function Room({pk, imageURL, name, city, country, rating, price, isOwner}:IRoomProps) {
     const gray = useColorModeValue("gray.600", "gray.300")
+    const navigate = useNavigate()
+    const onCameraClick = (event:React.SyntheticEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        navigate(`/rooms/${pk}/photos`)
+    }
     return (
         <Link to={`/rooms/${pk}`}>
             <VStack alignItems={"flex-start"}>
                 <Box position="relative" rounded={"3xl"} overflow={"hidden"} mb={2}>
-                    <Image minH="280"
+                    <Image objectFit={"cover"} minH="280"
                         src={imageURL} />
-                    <Button variant={"unstyled"} position="absolute" top={0} right={0} color="white">
-                        <FaRegHeart size="15px"/>
+                    <Button onClick={onCameraClick} variant={"unstyled"} position="absolute" top={0} right={0} color="white">
+                        { isOwner? <FaCamera size="15px"/> : <FaRegHeart size="15px"/>}
                     </Button>
                 </Box>
                 <Box w="100%">

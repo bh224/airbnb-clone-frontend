@@ -1,5 +1,6 @@
-import { Avatar, Box, Button, HStack, IconButton, LightMode, Menu, MenuButton, MenuItem, MenuList, Stack, Text, useColorMode, useColorModeValue, useDisclosure, useToast, VStack } from "@chakra-ui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { Avatar, Box, Button, HStack, IconButton, LightMode, Menu, MenuButton, MenuItem, MenuList, Stack, Text, ToastId, useColorMode, useColorModeValue, useDisclosure, useToast, VStack } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { FaAirbnb, FaMoon, FaSun } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { logOut } from "../api";
@@ -16,22 +17,29 @@ export default function Header() {
     const Icon = useColorModeValue(FaMoon, FaSun)
     const toast = useToast()
     const queryClient = useQueryClient()
+    const toastId = useRef<ToastId>();
+    const mutation = useMutation(logOut, {
+        onMutate: () => {
+                toastId.current = toast({
+                title: "loging out...",
+                description: "See you again!",
+                status: "loading"
+            })
+        },
+        onSuccess: () => {
+            if (toastId.current) {
+                queryClient.refetchQueries(['me'])
+                toast.update(toastId.current, {
+                status: "success",
+                title: "done",
+                description: "bye!",
+                duration: 1000,
+            })
+            }
+        },
+    })
     const onLogOut = async () => {
-        const toastId = toast({
-            title: "loging out...",
-            description: "See you again!",
-            status: "loading"
-        })
-        const data = await logOut();
-        console.log(data)
-        queryClient.refetchQueries(['me'])
-
-        toast.update(toastId, {
-            status: "success",
-            title: "done",
-            description: "bye!"
-        })
-
+        mutation.mutate();
     }
     return (
         <Stack direction={{
@@ -57,14 +65,21 @@ export default function Header() {
                     <Button onClick={onLoginOpen}>LogIn</Button>
                     <LightMode><Button onClick={onSignUpOpen} colorScheme={"red"}>SignUp</Button></LightMode>
                         </>) : (
+                            <HStack>
                             <Menu>
                                 <MenuButton>
                                     <Avatar name={user?.username} src={user?.avatar} size={"sm"} />
                                 </MenuButton>
                                 <MenuList>
-                                    <MenuItem onClick={onLogOut}>Log out</MenuItem>
+                                        <MenuItem onClick={onLogOut}>Log out</MenuItem>
+                                        {user?.is_host ?
+                                            <Link to="/rooms/upload">
+                                                <MenuItem>Upload Room</MenuItem>
+                                            </Link> : null }
                                 </MenuList>
-                            </Menu>
+                                </Menu>
+                                <Text fontSize={"sm"}>{user?.username}</Text>
+                            </HStack>
                             )
                     ) : null} 
             </HStack>
